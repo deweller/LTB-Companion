@@ -86,6 +86,8 @@ var entroMouse = window.entroMouse = {
     }
 }
 
+
+
 // -- transactions --
 
 var txType = 'txBCI';
@@ -371,7 +373,7 @@ rush = window.rush = {
 
         var manifest = chrome.runtime.getManifest();
 
-        $(".logo").html("KryptoKit v" + manifest.version);
+        $(".logo").html("LTB Companion v" + manifest.version);
 
         $("#addressTitle").show();
         $("#balanceBox").show();
@@ -2381,9 +2383,9 @@ $(document).ready(function ()
         }
         else
         {
-            entroMouse.start();
+            //entroMouse.start();
         }
-
+        rush.open();
     });
 });
 

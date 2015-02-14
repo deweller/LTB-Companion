@@ -23,9 +23,18 @@ $( "#addressselect" ).change(function () {
     
     var addr = $(this).val();
     
-    $("#xcpaddress").html(addr);
+//    chrome.storage.local.set(
+//                    {
+//                        'lastAddress': addr
+//                    }, function () {
+                    
+                        $("#xcpaddress").html(addr);
     
-    getPrimaryBalance(addr);
+                        getPrimaryBalance(addr);
+                    
+//                    });
+    
+    
 });
     
 });
