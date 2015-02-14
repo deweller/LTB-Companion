@@ -1,4 +1,4 @@
-KryptoKit
-=========
+LTB Companion
+=============
 
-Source code of KryptoKit extension for Google Chrome
+Prototype browser extension for Let's Talk Bitcoin
