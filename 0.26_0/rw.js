@@ -642,35 +642,36 @@ rush = window.rush = {
 
     },
 
-
+    
     "getBalance": function ()
     {
-        var url = "https://blockchain.info/q/addressbalance/" + this.address;
+//        var url = "https://blockchain.info/q/addressbalance/" + this.address;
+//
+//        $.ajax(
+//        {
+//            type: "GET",
+//            url: url,
+//            async: true,
+//            data:
+//            {}
+//
+//        }).done(function (msg)
+//        {
+//            rush.balance = msg / 100000000;
+//            var spendable = rush.balance - rush.txFee;
+//
+//            if (spendable < 0)
+//                spendable = 0;
+// 
+//            $("#balance").html("฿" + rush.balance.toFixed(8));
+//            $("#spendable").html("฿" + spendable.toFixed(8));
+//
+//            rush.getFiatValue();
+//        });
 
-        $.ajax(
-        {
-            type: "GET",
-            url: url,
-            async: true,
-            data:
-            {}
-
-        }).done(function (msg)
-        {
-            rush.balance = msg / 100000000;
-            var spendable = rush.balance - rush.txFee;
-
-            if (spendable < 0)
-                spendable = 0;
-
-            $("#balance").html("฿" + rush.balance.toFixed(8));
-            $("#spendable").html("฿" + spendable.toFixed(8));
-
-            rush.getFiatValue();
-
-        });
-
-
+     
+        
+    
 
     },
     "getFiatValue": function ()
@@ -1936,8 +1937,14 @@ rush = window.rush = {
     },
     "showSettings": function ()
     {
-        $("#showSettings").hide();
-        $("#tools").show();
+        if($("#showSettings").html() == "Show More")
+        {
+            $("#showSettings").html("Show Less");
+            $("#tools").show();
+        } else {
+            $("#showSettings").html("Show More");
+            $("#tools").hide();
+        }
     },
     "gpgShowSettings": function ()
     {

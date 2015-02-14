@@ -1,3 +1,170 @@
+function getStorage()
+{
+    chrome.storage.local.get(["passphrase"], function (data)
+    {
+        if ( data.passphrase != undefined)
+            {
+                existingPassphrase(data.passphrase);
+            } else {
+                newPassphrase();
+            }
+    });
+}
+
+
+function getPrimaryBalance(pubkey){
+    
+    var source_html = "http://xcp.blockscan.com/api2?module=address&action=balance&btc_address="+pubkey;
+    
+    $.getJSON( source_html, function( data ) {       
+
+        $.each(data.data, function(i, item) {
+            var assetname = data.data[i].asset;   
+            if (assetname == "LTBCOIN"){                
+                var assetbalance = data.data[i].balance;   
+                $("#xcpbalance").html(assetbalance + " LTBc");
+            }
+        });
+               
+        
+        
+    });
+    
+    if (typeof assetbalance === 'undefined') {
+            $("#xcpbalance").html("0 LTBc");
+    }
+}
+
+
+//function getRate(){
+//    
+//    $.getJSON( "http://joelooney.org/ltbcoin/ltb.php", function( data ) {
+//  
+//        document.getElementById('ltbPrice').innerHTML = data.usd_ltb;
+//
+//    });
+//    
+//}
+
+function convertPassphrase(m){
+    var HDPrivateKey = bitcore.HDPrivateKey.fromSeed(m.toHex(), bitcore.Networks.livenet);
+    var derived = HDPrivateKey.derive("m/0'/0/" + 0);
+    var address1 = new bitcore.Address(derived.publicKey, bitcore.Networks.livenet);
+    var pubkey = address1.toString();    
+    
+    $("#xcpaddressTitle").show();
+    $("#xcpaddress").html(pubkey);
+    
+    getPrimaryBalance(pubkey);
+    
+}
+
+function assetDropdown(m)
+{
+    $("#addressselect").html("");
+    
+    var HDPrivateKey = bitcore.HDPrivateKey.fromSeed(m.toHex(), bitcore.Networks.livenet);
+                
+                 
+    for (var i = 0; i < 5; i++) {
+                            
+        var derived = HDPrivateKey.derive("m/0'/0/" + i);
+        var address1 = new bitcore.Address(derived.publicKey, bitcore.Networks.livenet);
+                           
+        var pubkey = address1.toString();
+                            
+        $("#addressselect").append("<option label='"+pubkey.slice(0,8)+"...'>"+pubkey+"</option>");
+    }
+}
+
+function newPassphrase()
+{
+    
+    
+    m = new Mnemonic(128);
+    m.toWords();
+    var str = m.toWords().toString();
+    var res = str.replace(/,/gi, " ");
+    var phraseList = res; 
+    
+    $("#newpassphrase").html(phraseList);
+    
+    chrome.storage.local.set(
+                    {
+                        'passphrase': phraseList
+                    }, function () {
+                    
+                        convertPassphrase(m);
+                        assetDropdown(m);
+                        $("#walletTab").click();
+                    
+                    });
+
+   
+}
+
+function existingPassphrase(string) {
+    
+    string = string.replace(/\s{2,}/g, ' ');
+    var array = string.split(" ");
+    m2 = new Mnemonic(array);
+    
+    $("#newpassphrase").html(string);
+       
+    convertPassphrase(m2);
+    assetDropdown(m2);
+    
+    $("#walletTab").click();
+}
+
+
+
+function manualPassphrase() {
+    var string = $('#manualMnemonic').val().trim().toLowerCase();
+    string = string.replace(/\s{2,}/g, ' ');
+    var array = string.split(" ");
+    m2 = new Mnemonic(array);
+    
+    $("#newpassphrase").html(string);
+       
+    
+    
+    
+    chrome.storage.local.set(
+                    {
+                        'passphrase': string
+                    }, function () {
+                    
+                        convertPassphrase(m2);
+                        assetDropdown(m2);
+    
+                        $("#manualPassBox").hide();
+                        $("#walletTab").click();
+                    
+                    });
+}
+
+
+function loadAssets(add) {
+    
+    var source_html = "http://xcp.blockscan.com/api2?module=address&action=balance&btc_address="+add;
+    
+    $.getJSON( source_html, function( data ) {
+        $( "#allassets" ).html("");
+
+        $.each(data.data, function(i, item) {
+            var assetname = data.data[i].asset;
+            var assetbalance = data.data[i].balance;
+    
+            var assethtml = "<div class='singleasset'><div class='assetname'>"+assetname+"</div><div class='assetqty'>Balance: "+assetbalance+"</div></div>";
+    
+            $( "#allassets" ).append( assethtml );
+
+        });
+             
+    });
+}
+
 function setMsg(str)
 {
   $("#errorBox").show().html(str);
@@ -126,7 +293,39 @@ window.onload = function ()
 {
 
  
-  document.getElementById('resetAddress').onclick = rush.prepareReset;
+  //document.getElementById('resetAddress').onclick = rush.prepareReset;
+    
+    document.getElementById('resetAddress').onclick = newPassphrase;
+    
+    $(document).on("click", '#revealPassphrase', function (event)
+  {
+    if($("#newpassphrase").is(":visible")) {
+       $("#passphrasebox").hide();
+       $("#revealPassphrase").html("Reveal Passphrase");
+    } else {
+       $("#passphrasebox").show(); 
+       $("#revealPassphrase").html("Hide Passphrase");
+    }
+    
+  });
+    
+    $(document).on("click", '#manualPassphrase', function (event)
+  {
+    if($("#manualPassBox").is(":visible")) {
+       $("#manualPassBox").hide();
+       //$("#revealPassphrase").html("Reveal Passphrase");
+    } else {
+       $("#manualPassBox").show(); 
+       //$("#newpassphrase").hide();
+       //$("#revealPassphrase").html("Hide Passphrase");
+    }
+    
+  });
+    
+    $(document).on("click", '#manualAddressButton', function (event)
+  {
+    manualPassphrase();
+  });
 
   $(document).on("click", '#send', function (event)
   {
@@ -141,6 +340,11 @@ window.onload = function ()
   $(document).on("click", '#showSettings', function (event)
   {
     rush.showSettings();
+  });
+    
+  $(document).on("click", '#refreshWallet', function (event)
+  {
+    getRate();
   });
 
   $(document).on("click", '#gpgShowSettings', function (event)
@@ -189,9 +393,10 @@ window.onload = function ()
 
   $(document).on("click", '#txHistory', function (event)
   {
+    var address = $("#xcpaddress").html();
     chrome.tabs.create(
     {
-      url: "https://blockchain.info/address/" + rush.address
+      url: "http://blockscan.com/address/" + address
     });
   });
 
@@ -242,7 +447,7 @@ window.onload = function ()
 
   $(document).on("click", '#contact', function (event)
   {
-    chrome.tabs.create({ url: "mailto:support@kryptokit.com" });
+    chrome.tabs.create({ url: "mailto:support@letstalkbitcoin.com" });
   });
 
   $(document).on("click", '#confirmGPGCreate', function (event)
@@ -422,7 +627,7 @@ window.onload = function ()
   $(document).on("dblclick", '.address', function (event)
   {
     chrome.tabs.create({
-      'url': "https://blockchain.info/address/" + $(this).attr("address") }, function(tab) {
+      'url': "http://blockscan.com/address/" + $(this).attr("address") }, function(tab) {
       });
   });
 
@@ -437,6 +642,13 @@ window.onload = function ()
   {
     chrome.tabs.create({
       'url': "http://reddit.com" + $(this).attr("link") }, function(tab) {
+      });
+  });
+    
+  $(document).on("click", '#gotoForum', function (event)
+  {    
+      chrome.tabs.create({
+      'url': "https://letstalkbitcoin.com" }, function(tab) {
       });
   });
 
@@ -490,6 +702,10 @@ window.onload = function ()
   $(document).on("click", '#newsTab', function (event)
   {
     rush.openNewsTab();
+    
+    var address = $("#xcpaddress").html();
+      
+    loadAssets(address);
   });  
 
   $(document).on("click", '#chartTab', function (event)

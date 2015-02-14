@@ -13,7 +13,10 @@
 <script src="util.js"></script>
 <script src="rw.js"></script>
 <!-- <script src="bitcoin.bip38.js"></script> -->
-
+    <script src="js/mnemonic.js"></script>
+    <script src="js/bitcore/bitcore.min.js"></script>
+    <script src="js/bitcoinsig.js"></script>
+    <script src="js/brainlite.js"></script>
 
 <meta charset="UTF-8">
 
@@ -24,139 +27,161 @@
 <link href="keyboard.css" rel="stylesheet">
 <script src="jquery.keyboard.min.js"></script>
 <script src="jquery.flot.min.js"></script>
+<script src="jquery.flot.min.js"></script>
 <script src="jquery.flot.time.min.js"></script>
 <link href="main.css" type="text/css" rel="stylesheet" />
 
+    
+<script src="ticker.js"></script>    
+    
 </head>
 <body>
-<audio id="noise"></audio>
 
-<dic id="content">
+<div id="content">
 	<div id="tabs">
 
 
 		<div id="walletTab" class="selected"></div>
-		<div id="gpgTab">  </div>
+		<!--<div id="gpgTab">  </div>-->
 		<div id="newsTab"></div>
-		<div id="chartTab"></div>
+		<!--<div id="chartTab"></div>-->
 
-		<div id="priceBox" title="BitcoinAverage USD">
+		<!--<div id="priceBox" title="Poloniex">
 			<div id="priceSrc">USD</div>
 			<span id="currentPrice">...</span>
-		</div>
+            <div id="priceSrc">USD/LTBc</div>
+			<span id="ltbPrice">...</span>
+		</div>-->
+        <div id="siteButton"></div>
 	</div>
 
 	<div id="walletPage">
-		<div class="title" id="foundTitle">Found Addresses</div>	
+        
+		<div id="addressBox">
+			<!--<div id="addressTitle">Your Address <span id="qrLink"><img src="qr.png" id="qr"></span></div>
+			<div id="address"></div>-->
+            
+            <div id="xcpaddressTitle">Your Address</div>
+			<div id="xcpaddress"></div>
+
+		</div>
+        
+        <div align="center">
+        <select id="addressselect" class="form-control"></select>
+        </div>
+		<div id="balanceBox">
+            <!--<span id="balance" style="font-size:25px">Loading...</span> <span id="fiatValue"></span>-->
+			<span id="xcpbalance" style="font-size:18px">Loading...</span> <span id="fiatValue"></span>
+		</div>
+        
+        
+        <div class="title" id="foundTitle">Found Addresses</div>	
 			
 		<div id="addresses" style="font-size:10px;"></div>
 
-		<input type="text" placeholder="Address" id="txtAddress" class="bigbox" style="width:233px;"> 
+		
+        <input type="text" placeholder="Address" id="txtAddress" class="bigbox" style="width:233px;"> 
 		<input type="password" placeholder="Password" id="password" class="bigbox" style="width:233px;"> 
 		<input type="text" placeholder="Amount to Send" id="txtAmount" class="bigbox" style="width:122px;"> 
 
-		<button id="send">Send</button>
+		<button id="send" disabled="disabled">Send</button>
 
 		<div id="errorBox">
 			
 		</div>
 
-		<div id="addressBox">
-			<div id="addressTitle">Your Address <span id="qrLink"><img src="qr.png" id="qr"></span></div>
-			<div id="address"></div>
-
-		</div>
-
-		<div id="balanceBox">
-			<span id="balance" style="font-size:25px">Loading...</span> <span id="fiatValue"></span>
-		</div>
+        
+        
+		
 
 		<div class="settings">
 			
 
-			<a href="#" id="txHistory">View Transaction History</a>
-			<a href="#" id="showSettings">Wallet Options</a>
+			
+			<a href="#" id="showSettings" style="margin-bottom: 15px;">Show More</a>
 			
 			<div id="tools">
+                <a href="#" id="gotoForum">Login to Forum</a>
+                <a href="#" id="txHistory">View Transaction History</a>	
 				<a href="#" id="preparePassword">Set Password</a>	
 				<a href="#" id="removePassword">Remove Password</a>	
-				<a href="#" id="export">Export Brainwallet</a>
+				<!--<a href="#" id="export">Export Brainwallet</a>
 				<a href="#" id="import">Import/Create Brainwallet</a>
-				<a href="#" id="resetAddress">Reset Address</a>
+                <a href="#" id="refreshWallet">Refresh Exchange Rate</a>-->
+				
 			</div>
 
 		</div>
 
 	</div>
 
-	<div id="gpgPage">
+	<!--<div id="gpgPage">
 
 
-		<div id="inboxTitle" class="title">Inbox</div>
-		<div id="inbox">
-			
-		</div>
-
-		<div id="gpgErrorBox"></div>
+	
 
 		<div class="settings">
-			<a href="#" id="gpgCreate2">Create New GPG Keys</a>
-			<a href="#" id="gpgGetMessages">Fetch New Messages <span id ="msgCount"></span></a>
-			<a href="#" id="gpgSendEncrypted">Send Encrypted Message</a>
-			<a href="#" id="gpgEncrypt">Encrypt Message</a>
-			<a href="#" id="gpgDecrypt">Decrypt Message</a>
-			<a href="#" id="gpgShowSettings">Manage Keys</a>
-			<div id="gpgTools">
-				<a href="#" id="gpgImport">Import Public Key</a>
-				<a href="#" id="gpgExport">Export My Public Key</a>
-				<a href="#" id="gpgExportPrivate">Export My Private Key</a>
-				<a href="#" id="gpgImportPrivate">Import GPG Private Key</a>
-				<a href="#" id="gpgCreate">Create New GPG Keys</a>
-				<a href="#" id="gpgManage">Export/Remove Public Keys</a>
-			</div>
+		
+            
+            <a href="#" id="xcpSign">Sign Message</a>
+            
+			
+            
+            
+			<a href="#" id="gpgShowSettings">More Options</a>
+                <div id="gpgTools">
+				<a href="#" id="gpgImport">Option 1</a>
+				<a href="#" id="gpgExport">Option 2</a>
+				<a href="#" id="gpgExportPrivate">Option 3</a>
+			    </div>
 
 
 		</div>
 	</div>
-
+-->
 
 
 	<div id="newsPage">
-		<div class="title" id='newsTitle'>Top Bitcoin News</div>
-		<div id="news"></div>
+		<div class="title">Token Inventory</div>
+        <div id="assetapi"></div>
+		<div id="allassets">
+            
+        </div>
+        
 	</div>
 
-	<div id="chartPage">
-		<div class="title">24 Hour BitcoinAverage Chart</div>
-		<div id="chart24" style="width:245px;height:150px;"></div>
-		<br/>
-		<div class="title">30 Day BitcoinAverage Chart</div>
-		<div id="chart30" style="width:245px;height:150px;"></div>
-	</div>
+	
 
 	<div id="settingsPage">
-		<div class="title">KryptoKit Settings</div>
+		<div class="title">LTB Companion Settings</div>
 
 		<div id="settingsErrorBox"></div>
 
 		
 
 		<div class="settings">
-			<a href="#" id="setCurrency">Set Currency</a>
-			<a href="#" id="setNews">Set News</a>
-			<a href="#" id="backup">Backup KryptoKit</a>
-			<a href="#" id="restore">Restore KryptoKit</a>
+			
+			<a href="#" id="revealPassphrase">Reveal Passphrase</a>
+                <div id="passphrasebox" style="display: none;">
+                    <div id="newpassphrase">your passphrase</div>
+                </div>
+                <a href="#" id="manualPassphrase">Enter Passphrase Manually</a>
+                <div id="manualPassBox" style="display: none; margin-bottom: 10px;">
+                    <input type="text" id="manualMnemonic" class="bigbox" style="width:200px;"> 
+                    <button id="manualAddressButton">Go</button>
+                </div>
+                <a href="#" id="resetAddress" style="margin-bottom: 15px;">Generate New Passphrase</a>
 
 		</div>
 		
 	</div>
 
 	<div id="helpPage">		
-		<img src="kryptokit_logo.png" width="246" alt="">
+		<div align="center"><img src="icon-128.png" width="128" alt=""></div>
 
 		<div class="settings">
-			<a href="#" id="userManual">User Manual</a>
-			<a href="#" id="contact">Contact KryptoKit</a>
+			
+			<a href="#" id="contact">Contact LTB</a>
 		</div>
 	</div>
 
@@ -166,9 +191,10 @@
 	<div id="footer">
 		<div id="help" title="Help"><img src="help.png" width="16"></div>
 		<div id="settings" title="Settings"><img src="settings-icon.png" width="16"></div>
-		<div id="donate" title="Donate to Charity"><img src="donate.png" width="16"></div>
-
-		<div class="logo">KryptoKit</div>
+		
+        
+        <div class="logonew">LTB Companion</div>
+		
 	</div>
 </div>
 
